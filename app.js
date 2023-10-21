@@ -10,13 +10,31 @@ const app = express()
 // json body
 app.use(express.json())
 
+// Limit requests
+const rateLimiter = require('express-rate-limit')
+app.use(
+  rateLimiter({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+}))
+
+// Header security
+const helmet = require('helmet')
+app.use(helmet())
+
+// Cross Origin Requests
+const cors = require('cors')
+app.use(cors())
+
+// Prevent Cross Site Scripting attacks
+const xss = require('xss')
+app.use(xss())
+
 // ---------- ROUTES ----------
 
   // Authentication
 const myroutes = require('./back-end/routes/auth')
 app.use('/', myroutes)
-
-
 
 
 // ------ ERROR HANDLERS ------

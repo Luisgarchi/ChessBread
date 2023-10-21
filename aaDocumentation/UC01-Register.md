@@ -7,7 +7,7 @@
 - **Flow of Events:** 
     1. User enters registration details
     2. Client side form validation
-    3. On success user is logged in and redirected
+    3. On success user is registered and logged in and redirected
 
 - **Pre-conditions:**
     1. User not already logged in
@@ -26,5 +26,10 @@
 - **Frequency:**
     - Every time a new user tries to register
 
+- **Related UC:**
+    - UC_02
+    - UC_03
+
 - **Comment:**
-    - Luis: How do send the client the correct information for form validation? Should we send this in the response body of the **/register get** request? I.e. how do we let the user know the min/max number of characters for each forms, how do we tell them that a username/email is already taken?
+    - *Luis*: How do send the client the correct information for form validation? Should we send this in the response body of the **/register get** request? I.e. how do we let the user know the min/max number of characters for each forms, how do we tell them that a username/email is already taken?
+    - *Luis*: Should the user be redirect to a register page or should a form/alert pop up on the same directory the user is at? I.e. client vs server?. If client then we only need post routes. 
