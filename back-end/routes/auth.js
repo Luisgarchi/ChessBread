@@ -1,13 +1,31 @@
 const express = require('express')
 const router = express.Router()
+const {passportAuthenticate} = require('../middleware/auth')
 
-const { register, login } = require('../controllers/auth')
+const {
+    registerPage,
+    registerUser,
+    loginPage,
+    logout,
+} = require('../controllers/auth')
+
+
 
 // Register routes
-router.route('/register').get((req, res) => {res.send('Register Page')}).post(register)
+router.route('/register')
+    .get(registerPage)
+    .post(registerUser)
 
-// Logini routes
-router.route('/login').get((req, res) => {res.send('Login Page')}).post(login)
+// Login routes
+router.route('/login')
+    .get(loginPage)
+    .post(passportAuthenticate)
+
+
+// Logout routes
+router.route('/logout')
+    .post(logout)
+
 
 
 

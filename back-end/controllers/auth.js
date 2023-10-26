@@ -1,38 +1,49 @@
 const User = require('../models/User')
-const { StatusCodes } = require('http-status-codes')
-//const { BadRequestError, UnauthenticatedError } = require('../errors')
-const  {createCustomError} = require('../errors/custom-error')
 
+// ------------ Register ------------
 
-const register = async (req, res) => {
+// GET
+const registerPage = (req, res) => {
+    res.render('register')
+}
+
+// POST
+const registerUser = async (req, res) => {
+    console.log(req.body)
     const user = await User.create({... req.body})
-    res.status(StatusCodes.CREATED).json({user})
+
+    req.login(user, function(err) {
+        if (err) { return next(err) }
+        res.redirect('/')
+    })
 }
 
 
-const login = async (req, res) => {
-    const {email, password} = req.body
-    console.log(email, password)
-    
-    if (!email || !password) {
-        throw createCustomError('Please provide email and password', StatusCodes.BAD_REQUEST)
-    }
-    const user = await User.findOne({email})
+// ------------ Login ------------
 
-    if (!user) {
-        throw createCustomError('Invalid Credentials', StatusCodes.UNAUTHORIZED)
-    }
-    const isPasswordCorrect = await user.comparePassword(password)
-    if (!isPasswordCorrect) {
-        throw createCustomError('Invalid Credentials', StatusCodes.UNAUTHORIZED)
-    }
-    const token = user.createJWT()
-    res.status(StatusCodes.OK).json({user: {username:user.getUserName()}, token })
+// GET
+const loginPage = (req, res) => {
+    console.log(req.user)
+    console.log(req.session)
+    res.render('login')
+}
+// POST - handled by passport "auth" middleware
+
+
+// ------------ Logout ------------
+
+const logout = (req, res) => {
+    req.logout(function(err) {
+        if (err) { return next(err) }
+        res.redirect('/')
+    })
 }
 
 
 
 module.exports = {
-    register,
-    login,
+    registerPage,
+    registerUser,
+    loginPage,
+    logout,
 }

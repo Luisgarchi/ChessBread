@@ -1,14 +1,34 @@
 // -------------------- SET UP --------------------
 require('dotenv').config()
 require('express-async-errors')
+
+const path = require('path')
+const passport = require('passport')
+const session = require('express-session')
+const MongoStore = require('connect-mongo')
+
+
+// ---------- Init App ----------
 const express = require('express')
 const app = express()
+
+// -------- Engine Setup --------
+app.set('views', path.join(__dirname, 'front-end/views'))
+app.set('view engine', 'ejs')
+
 
 
 // -------------------- MIDDLEWARE --------------------
 
-// json body
-app.use(express.json())
+app.use(express.json())       // Parse json body
+app.use(express.urlencoded({ extended: true })) //Parse URL-encoded bodies
+
+// Serve static files
+app.use(express.static(path.join(__dirname, 'front-end/public')));
+
+
+
+// --------- Security ---------
 
 // Limit requests
 const rateLimiter = require('express-rate-limit')
@@ -27,14 +47,32 @@ const cors = require('cors')
 app.use(cors())
 
 // Prevent Cross Site Scripting attacks
-const xss = require('xss')
+const xss = require('xss-clean')
 app.use(xss())
+
+
+// -------- DB and Session -------
+const connectDB = require('./back-end/db/connect')
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({mongoUrl:process.env.MONGO_URI})
+}))
+
+app.use(passport.authenticate('session'));
+
 
 // ---------- ROUTES ----------
 
   // Authentication
 const myroutes = require('./back-end/routes/auth')
 app.use('/', myroutes)
+
+const indexRouter = require('./back-end/routes/index')
+app.use('/', indexRouter)
+
 
 
 // ------ ERROR HANDLERS ------
@@ -51,11 +89,11 @@ app.use(errorHandlerMiddleware)
 
 
 
+
+
 // -------------------- START APP --------------------
-const connectDB = require('./back-end/db/connect')
 
 const port = process.env.PORT || 3000
-
 
 const start = async () => {
   try {
