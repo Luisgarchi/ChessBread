@@ -9,7 +9,7 @@ const registerPage = (req, res) => {
 
 // POST
 const registerUser = async (req, res) => {
-    console.log(req.body)
+    
     const user = await User.create({... req.body})
 
     req.login(user, function(err) {
@@ -23,8 +23,6 @@ const registerUser = async (req, res) => {
 
 // GET
 const loginPage = (req, res) => {
-    console.log(req.user)
-    console.log(req.session)
     res.render('login')
 }
 // POST - handled by passport "auth" middleware

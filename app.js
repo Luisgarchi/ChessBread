@@ -58,11 +58,26 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({mongoUrl:process.env.MONGO_URI})
+  store: MongoStore.create({
+    mongoUrl:process.env.MONGO_URI,
+    autoRemove: 'interval',
+    autoRemoveInterval: 60*24*7}),
+  cookie: {maxAge: 1000*60*60*24*7}
 }))
 
-app.use(passport.authenticate('session'));
 
+app.use(passport.authenticate('session'))
+/*
+// or 
+app.use(passport.initialize())  // line deprecated
+app.use(passport.session())
+*/
+
+app.use((req, res, next) => {
+  console.log(req.session)
+  console.log(req.user)
+  next()
+})
 
 // ---------- ROUTES ----------
 

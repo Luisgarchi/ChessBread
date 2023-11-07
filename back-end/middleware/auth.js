@@ -12,7 +12,6 @@ passport.use(new LocalStrategy(async function verify(username, password, next) {
     if (!username || !password) {
 
         return next(null, false, { message: 'Incorrect username or password.' })
-        //return next(new BadRequestError('Please provide email and password'))
     }
 
     // Try and find a user
@@ -21,7 +20,6 @@ passport.use(new LocalStrategy(async function verify(username, password, next) {
     // Check that a matching user has been found in the db
     if (!userDB) {
         return next(null, false, { message: `Username: ${username} does not exist.` })
-        //return next(new UnauthenticatedError(`Username: ${username} does not exist`))
     }
 
     const isPasswordCorrect = await userDB.comparePassword(password)
@@ -34,17 +32,17 @@ passport.use(new LocalStrategy(async function verify(username, password, next) {
 }))
 
 
-passport.serializeUser(function(user, next) {
-    console.log('Serialize')
+passport.serializeUser(function(user, done) {
+    console.log('serialize')
     process.nextTick(function() {
-        next(null, { id: user.id, username: user.username });
-    });
-});
+        done(null, { id: user.id, username: user.username })
+    })
+})
 
-passport.deserializeUser(function(user, next) {
+passport.deserializeUser(function(user, done) {
     console.log('deserialize')
     process.nextTick(function() {
-        return next(null, user);
+        return done(null, user);
     });
 });
 
